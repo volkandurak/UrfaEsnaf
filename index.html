@@ -726,7 +726,7 @@ function doDelete(){
   const idx = esnaflar.findIndex(x=>x.id===selId);
   if(idx>-1){
     esnaflar.splice(idx,1);
-    delete reviews[selId];
+    delete savedReviews[selId];
     save(); render();
     closeDelete();
     closeDetail();
