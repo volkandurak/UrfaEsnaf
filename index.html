@@ -178,6 +178,8 @@ html, body { width:100%; height:100%; font-family:'DM Sans',sans-serif; overflow
 .rev-author { font-size:11px; font-weight:700; color:var(--ink); margin-bottom:2px; }
 .no-rev { font-size:12px; color:var(--ink-3); font-style:italic; }
 .btn-rev { width:100%; height:40px; background:transparent; border:1px solid var(--line); border-radius:8px; font-family:'DM Sans',sans-serif; font-size:13px; font-weight:600; color:var(--ink-2); cursor:pointer; margin-top:6px; display:flex; align-items:center; justify-content:center; gap:5px; }
+.btn-delete { width:100%; height:40px; background:transparent; border:1px solid #ffcccc; border-radius:8px; font-family:'DM Sans',sans-serif; font-size:13px; font-weight:600; color:#cc2200; cursor:pointer; margin-top:4px; display:flex; align-items:center; justify-content:center; gap:5px; }
+.btn-delete:hover { background:#fff0ee; }
 
 /* FORM */
 .type-toggle { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:14px; }
@@ -242,6 +244,7 @@ html, body { width:100%; height:100%; font-family:'DM Sans',sans-serif; overflow
   </div>
   <div class="filter-row" id="filters">
     <button class="chip active" data-cat="Tümü">Tümü</button>
+    <button class="chip" data-cat="__DUNYA__">🌍 Dünya</button>
     <button class="chip" data-cat="Kebapçı">🥙 Kebapçı</button>
     <button class="chip" data-cat="Lahmacuncu">🫓 Lahmacun</button>
     <button class="chip" data-cat="Fırın">🍞 Fırın</button>
@@ -295,6 +298,27 @@ html, body { width:100%; height:100%; font-family:'DM Sans',sans-serif; overflow
       <div class="rev-heading">Yorumlar</div>
       <div id="d-revs"></div>
       <button class="btn-rev" onclick="openRev()">★ &nbsp;Yorum & Puan Ekle</button>
+      <button class="btn-delete" id="btn-delete" onclick="confirmDelete()" style="display:none">🗑 Mekanı Sil</button>
+    </div>
+  </div>
+</div>
+
+<!-- DELETE PASSWORD MODAL -->
+<div class="overlay" id="delete-modal">
+  <div class="bmodal" onclick="event.stopPropagation()" style="max-height:260px">
+    <div class="bm-handle-bar"></div>
+    <div class="bm-head">
+      <div style="font-weight:700;font-size:1rem">🗑 Mekanı Sil</div>
+      <button class="bm-close" onclick="closeDelete()">✕</button>
+    </div>
+    <div class="bm-body" style="padding:1rem">
+      <div style="margin-bottom:0.75rem;color:var(--text2);font-size:0.9rem">Bu mekanı silmek için şifreyi girin:</div>
+      <input type="password" id="del-pass" placeholder="Şifre" style="width:100%;padding:0.6rem 0.8rem;border:1px solid var(--line);border-radius:8px;font-size:1rem;box-sizing:border-box;margin-bottom:0.75rem" onkeydown="if(event.key==='Enter')doDelete()">
+      <div id="del-err" style="color:#e53;font-size:0.82rem;margin-bottom:0.5rem;display:none">❌ Yanlış şifre!</div>
+      <div style="display:flex;gap:0.5rem">
+        <button class="btn-cancel" style="flex:1" onclick="closeDelete()">İptal</button>
+        <button class="btn-save" style="flex:1;background:#e53" onclick="doDelete()">Sil</button>
+      </div>
     </div>
   </div>
 </div>
@@ -572,7 +596,14 @@ const BASE_DATA = [
   {"id":10501,"name":"Urfa Kebap (Hakkari)","category":"Kebapçı","city":"Hakkari","district":"Merkez","address":"Merkez/Hakkari","lat":37.5744,"lng":43.7408,"phone":"","type":"urfa_is","notes":"Hakkaride Urfa usulü kebap ve lahmacun.","reviews":[{"author":"Hakkarili","star":4,"text":"Hakkari dağlarında Urfa lezzeti. İnanılmaz bir buluşma!"},{"author":"Yerel","star":4,"text":"Kebap lezzetli ve uygun fiyatlı."}]},
   {"id":10601,"name":"Urfa Kebap (Iğdır)","category":"Kebapçı","city":"Iğdır","district":"Merkez","address":"Merkez/Iğdır","lat":39.9231,"lng":44.0444,"phone":"","type":"urfa_is","notes":"Iğdırda Urfa usulü kebap ve lahmacun.","reviews":[{"author":"Iğdırlı","star":4,"text":"Iğdır ve Urfa arası uzak ama lezzetleri yakın. Kebap harika."},{"author":"Yerel","star":4,"text":"Ararat eteklerinde Urfa kebabı. Efsane."}]},
   {"id":10701,"name":"Urfa Kebap (Kars)","category":"Kebapçı","city":"Kars","district":"Merkez","address":"Merkez/Kars","lat":40.61,"lng":43.0975,"phone":"","type":"urfa_is","notes":"Karsta Urfa usulü kebap ve lahmacun.","reviews":[{"author":"Karslı","star":4,"text":"Kars peynirinin yanına bir de Urfa kebabı koymak, tam gün oldu!"},{"author":"Yerel","star":4,"text":"Lezzet kalitesi yüksek. Tavsiye ederim."}]},
-  {"id":10801,"name":"Urfa Beykonağı Ocakbaşı","category":"Ocakbaşı","city":"Bartın","district":"Merkez","address":"Köyortası Mh. Tersane Cd. No:32/1, Bartın Merkez","lat":41.6369,"lng":32.3375,"phone":"","type":"urfa_is","notes":"Adında Urfa olan, Bartın merkezde ocakbaşı. Menüde Urfa kebap, fıstıklı kebap, patlıcanlı kebap, şalgam suyu var.","reviews":[{"author":"Bartınlı","star":5,"text":"Bartında böyle bir mekan varmış bilmiyordum. Urfa kebabı ve fıstıklı kebap muhteşem!"},{"author":"Yolcu","star":4,"text":"Karadeniz kıyısında Urfa ocakbaşı. Şalgam suyu ve kebap kombinasyonu harika."}]}
+  {"id":10801,"name":"Urfa Beykonağı Ocakbaşı","category":"Ocakbaşı","city":"Bartın","district":"Merkez","address":"Köyortası Mh. Tersane Cd. No:32/1, Bartın Merkez","lat":41.6369,"lng":32.3375,"phone":"","type":"urfa_is","notes":"Adında Urfa olan, Bartın merkezde ocakbaşı. Menüde Urfa kebap, fıstıklı kebap, patlıcanlı kebap, şalgam suyu var.","reviews":[{"author":"Bartınlı","star":5,"text":"Bartında böyle bir mekan varmış bilmiyordum. Urfa kebabı ve fıstıklı kebap muhteşem!"},{"author":"Yolcu","star":4,"text":"Karadeniz kıyısında Urfa ocakbaşı. Şalgam suyu ve kebap kombinasyonu harika."}]},
+  {"id":20001,"name":"Urfa Dürüm","category":"Kebapçı","city":"Paris","district":"10. Arrondissement","address":"58 Rue du Faubourg Saint-Denis, 75010 Paris, Fransa","lat":48.87,"lng":2.3575,"phone":"","type":"urfa_is","notes":"Anthony Bourdain'in gittiği meşhur Paris Urfa kebabı. Pencerede gözden yapılan lavaş ile ünlü. Paris'in en iyi kebabı seçilmiş.","reviews":[{"author":"Parisli Hemşeri","star":5,"text":"Bourdain'in gittiği yer! Kuzu şiş muhteşem. Paris'te Urfa özlemi bitiyor."},{"author":"Turist","star":5,"text":"Lavaşı gözde pişiriyorlar. Et mükemmel pişmiş. Paris'in en iyisi bu."}]},
+  {"id":20002,"name":"Kebab Urfa 63","category":"Kebapçı","city":"Paris","district":"13. Arrondissement","address":"31 Blvd Auguste Blanqui, 75013 Paris, Fransa","lat":48.8317,"lng":2.3519,"phone":"","type":"urfa_is","notes":"Paris 13. bölgede Urfa adını taşıyan kebap. 4.5 puan, 377 yorum.","reviews":[{"author":"Parisli","star":5,"text":"Le grec inanılmaz lezzetli. Fiyat çok uygun. Urfa ismi boşa değil!"},{"author":"Yerel","star":4,"text":"Hızlı servis, kaliteli kebap. Semtin en iyisi."}]},
+  {"id":20003,"name":"Urfa Kebap","category":"Kebapçı","city":"Berlin","district":"Neukölln","address":"Kottbusser Damm 33, 10967 Berlin, Almanya","lat":52.4883,"lng":13.4247,"phone":"","type":"urfa_is","notes":"Hermannplatz metro durağı yanında. Berlin'in en iyi kebabı olarak önerilen mekan. Vejetaryen seçenekler de var.","reviews":[{"author":"Berliner","star":4,"text":"Berlin'de Urfa kebabı! Canlı müzik de oluyor bazen. Harika ortam."},{"author":"Hemşeri","star":5,"text":"Tavuk döner ve falafel dışında gerçek Urfa kebabı bulduk sonunda."}]},
+  {"id":20004,"name":"As Urfa Kebap Restaurant","category":"Kebapçı","city":"Hamburg","district":"St. Georg","address":"Lange Reihe, St. Georg, 20099 Hamburg, Almanya","lat":53.5532,"lng":10.0099,"phone":"","type":"urfa_is","notes":"Hamburg garı yakınında St. Georg'da. Yogurtlu kebap meşhur. Tripadvisor yıldızlı.","reviews":[{"author":"Hamburg'lu","star":5,"text":"Hamburg garından 1 dakika yürüme. Yogurtlu kebap efsane. Her geçişte uğruyoruz."},{"author":"Yolcu","star":5,"text":"Servis hızlı ve güler yüzlü. Meze de çok bol geliyor."}]},
+  {"id":20005,"name":"Miss Urfa Kebap House","category":"Kebapçı","city":"Hamburg","district":"Barmbek","address":"Fuhlsbüttler Str. 159, 22305 Hamburg, Almanya","lat":53.5847,"lng":10.0439,"phone":"","type":"urfa_is","notes":"Taze et, künefe ve şavarma. Aile dostu mekan, A1 otoyolu yakını.","reviews":[{"author":"Hamburglu","star":4,"text":"Kunefe muhteşem! Et günlük taze. Aile ile gelmeye uygun güzel mekan."},{"author":"Yerel","star":4,"text":"Türk mutfağını en iyi temsil eden Hamburg mekanlarından biri."}]},
+  {"id":20006,"name":"Urfa Kebap Haus Frankfurt","category":"Kebapçı","city":"Frankfurt","district":"Ostend","address":"Ostend / Osthafen, Frankfurt am Main, Almanya","lat":50.1069,"lng":8.7154,"phone":"","type":"urfa_is","notes":"Kömür ızgaralı Urfa kebabı. Yerel Urfa yemekleri menüde. Frankfurt'ta Türk diasporasının adresi.","reviews":[{"author":"Frankfurt'lu","star":4,"text":"Kömür ızgara kokusu girince vuruyor insanı. Gerçek Urfa lezzeti."},{"author":"Seyahatçi","star":5,"text":"Urfa'ya mahsus yemekleri bulduk Frankfurt'ta. Usta emeği belli."}]},
+  {"id":20007,"name":"Urfa Kebab Limited","category":"Kebapçı","city":"Londra","district":"Enfield","address":"Unit 12 Edison Road, Enfield, EN3 7XF Londra, İngiltere","lat":51.6608,"lng":0.0068,"phone":"","type":"urfa_is","notes":"Londra Enfield'da resmi şirket kaydı olan Urfa kebabı. Lisanslı restoran.","reviews":[{"author":"Londralı","star":4,"text":"Enfield'da güvenilir Urfa lezzeti. Hemşeri emeği belli."},{"author":"Yerel","star":4,"text":"Urfa ismi boşa değil. Kebap ve lahmacun kalitesi iyi."}]}
 ];
 let userEsnaflar = []; try { userEsnaflar = JSON.parse(localStorage.getItem('urfa_user')||'[]'); } catch(e){}
 let savedReviews = {}; try { savedReviews = JSON.parse(localStorage.getItem('urfa_reviews')||'{}'); } catch(e){}
@@ -604,8 +635,12 @@ function addMarker(e){
   markers[e.id]=m;
 }
 
+const TURKEY_CITIES = new Set(['Adana','Adıyaman','Afyonkarahisar','Ağrı','Aksaray','Amasya','Ankara','Antalya','Ardahan','Artvin','Aydın','Balıkesir','Bartın','Batman','Bayburt','Bilecik','Bingöl','Bitlis','Bolu','Burdur','Bursa','Çanakkale','Çankırı','Çorum','Denizli','Diyarbakır','Düzce','Edirne','Elazığ','Erzincan','Erzurum','Eskişehir','Gaziantep','Giresun','Gümüşhane','Hakkari','Hatay','Iğdır','Isparta','İstanbul','İzmir','Kahramanmaraş','Karabük','Karaman','Kars','Kastamonu','Kayseri','Kırıkkale','Kırklareli','Kırşehir','Kilis','Kocaeli','Konya','Kütahya','Malatya','Manisa','Mardin','Mersin','Muğla','Muş','Nevşehir','Niğde','Ordu','Osmaniye','Rize','Sakarya','Samsun','Siirt','Sinop','Sivas','Şanlıurfa','Şırnak','Tekirdağ','Tokat','Trabzon','Tunceli','Uşak','Van','Yalova','Yozgat','Zonguldak']);
+
 function render(){
   const filtered=esnaflar.filter(e=>{
+    const isDunya = !TURKEY_CITIES.has(e.city);
+    if(fCat==='__DUNYA__') return isDunya && (!fQ || e.name.toLowerCase().includes(fQ.toLowerCase())||(e.city||'').toLowerCase().includes(fQ.toLowerCase()));
     const mc=fCat==='Tümü'||e.category===fCat;
     const q=fQ.toLowerCase();
     const ms=!q||e.name.toLowerCase().includes(q)||(e.city||'').toLowerCase().includes(q)||(e.district||'').toLowerCase().includes(q);
@@ -662,9 +697,40 @@ function showDetail(id){
   rev.innerHTML=!e.reviews.length?'<div class="no-rev">Henüz yorum eklenmemiş.</div>':e.reviews.slice(-4).map(r=>`<div class="rev-row"><div class="rev-author">${r.author} ${'★'.repeat(r.star)}</div>${r.text}</div>`).join('');
   document.getElementById('detail-overlay').classList.add('show');
   if(e.lat&&e.lng) map.setView([e.lat,e.lng],14,{animate:true});
+  // Kullanıcı eklediği mekanlar silinebilir (BASE_DATA dışındaki)
+  const isUserAdded = !baseIds.has(e.id);
+  document.getElementById('btn-delete').style.display = isUserAdded ? 'block' : 'block'; // her mekan silinebilir
 }
 
 function closeDetail(){ selId=null; document.getElementById('detail-overlay').classList.remove('show'); }
+
+function confirmDelete(){
+  document.getElementById('del-pass').value='';
+  document.getElementById('del-err').style.display='none';
+  document.getElementById('delete-modal').classList.add('show');
+  setTimeout(()=>document.getElementById('del-pass').focus(),100);
+}
+function closeDelete(){ document.getElementById('delete-modal').classList.remove('show'); }
+function doDelete(){
+  const pass = document.getElementById('del-pass').value;
+  const DELETE_PASS = 'urfa2025';
+  if(pass !== DELETE_PASS){
+    document.getElementById('del-err').style.display='block';
+    document.getElementById('del-pass').value='';
+    document.getElementById('del-pass').focus();
+    return;
+  }
+  if(!selId) return;
+  const idx = esnaflar.findIndex(x=>x.id===selId);
+  if(idx>-1){
+    esnaflar.splice(idx,1);
+    delete reviews[selId];
+    save(); render();
+    closeDelete();
+    closeDetail();
+    alert('Mekan silindi.');
+  }
+}
 
 function openAdd(){ document.getElementById('add-modal').classList.add('show'); }
 function closeAdd(){
@@ -721,7 +787,10 @@ document.getElementById('filters').addEventListener('click',ev=>{
   if(!ev.target.matches('.chip')) return;
   document.querySelectorAll('.chip').forEach(b=>b.classList.remove('active'));
   ev.target.classList.add('active');
-  fCat=ev.target.dataset.cat; render();
+  fCat=ev.target.dataset.cat;
+  if(fCat==='__DUNYA__') map.setView([48,10],4,{animate:true});
+  else if(fCat==='Tümü') map.setView([39,35],6,{animate:true});
+  render();
 });
 
 document.getElementById('search-input').addEventListener('input',ev=>{ fQ=ev.target.value; render(); });
