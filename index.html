@@ -304,7 +304,7 @@ html, body { width:100%; height:100%; font-family:'DM Sans',sans-serif; overflow
 </div>
 
 <!-- DELETE PASSWORD MODAL -->
-<div class="overlay" id="delete-modal">
+<div class="overlay" id="delete-modal" onclick="closeDelete()">
   <div class="bmodal" onclick="event.stopPropagation()" style="max-height:260px">
     <div class="bm-handle-bar"></div>
     <div class="bm-head">
@@ -613,6 +613,8 @@ let esnaflar = BASE_DATA.map(e => ({
   reviews: savedReviews[e.id] || e.reviews
 })).concat(userEsnaflar);
 
+const baseIds = new Set(BASE_DATA.map(e=>e.id));
+
 const map = L.map('map',{center:[39,35],zoom:6,zoomControl:false});
 L.control.zoom({position:'bottomright'}).addTo(map);
 L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{attribution:'© CartoDB',maxZoom:19}).addTo(map);
@@ -803,7 +805,6 @@ map.on('contextmenu',function(ev){
 
 function save(){
   try{
-    const baseIds=new Set(BASE_DATA.map(e=>e.id));
     localStorage.setItem('urfa_user',JSON.stringify(esnaflar.filter(e=>!baseIds.has(e.id))));
     const reviews={};
     esnaflar.filter(e=>baseIds.has(e.id)&&e.reviews.length).forEach(e=>{reviews[e.id]=e.reviews;});
